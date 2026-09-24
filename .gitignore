@@ -1,0 +1,25 @@
+# OS / editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+
+# Office temp / lock files
+~$*
+*.tmp
+
+# SQL Server / SSMS artifacts
+*.bak
+*.mdf
+*.ldf
+*.ssmssln
+*.ssmssqlproj
+
+# Power BI files (not published - may contain connection info and a copy of the data)
+*.pbix
+
+# Course submission documents (kept private)
+*.docx
+*.pdf

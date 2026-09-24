@@ -113,6 +113,17 @@ erDiagram
 
 We also drew our own ERD for the course (`docs/erd_course_submission.png`). The final SQL differs slightly from that drawing: in the SQL, `SEARCH_RETURNS` stores `Result_Rank` and `Clicked`.
 
+## Synthetic data generation
+
+`data-generation/generate_fake_data.py` uses Python, pandas and Faker to create the data. It builds the tables in dependency order: parent tables first, then the tables that reference them. That way every foreign key points to a row that already exists, and the pairs in the link tables are unique. Each table is exported to a CSV file. The row counts (350 customers, 1,500 orders, and so on) are set at the top of the script. Product names are put together from lists of Zales-style collections, stones and styles.
+
+```bash
+pip install pandas faker
+python data-generation/generate_fake_data.py
+```
+
+The script produced the first version of the data, where `SEARCHES` had a simple `Search_ID` key. In the final schema the key is (`Search_IP`, `Search_DT`), and the data was adjusted to match. That conversion step is not part of this script. Running the script again produces a new random dataset, not the exact rows in `sql/01`.
+
 ## SQL concepts used
 
 | Concept | Where |
@@ -148,14 +159,14 @@ More pages: [monthly trends](docs/powerbi/02_monthly_trends.png), [category deta
 This was a three-person team project. My part:
 
 - Built the database in SQL Server: the tables, keys and constraints
-- Generated the synthetic data. We had no access to the company's real data, so I wrote a script with Cursor (an AI-assisted code editor) to fill the tables with made-up records. The script is not included in this repository, only the data it produced.
+- Generated the synthetic data. We had no access to the company's real data, so I wrote a Python script with Cursor (an AI-assisted code editor) to fill the tables with made-up records (`data-generation/generate_fake_data.py`).
 - Wrote and ran the analysis queries
 
 The other parts of the project were done by my teammates or together.
 
 ## Use of AI tools
 
-The synthetic data was generated with a script written in Cursor (see Team above). The table design and the SQL in this repository were written without AI help, except for two course assignments that required a generative AI tool (a course-provided ChatGPT assistant):
+The synthetic data generator was written in Cursor (see Team above). The table design and the SQL in this repository were written without AI help, except for two course assignments that required a generative AI tool (a course-provided ChatGPT assistant):
 
 1. Comparing our conceptual ERD with one the tool suggested.
 2. Asking the tool to optimize existing queries. We applied one suggestion: replacing `YEAR(Date) = 2024` with a date range, which can be faster, especially when the date column has an index. We then used `EXCEPT` to check that both versions return the same rows. See `sql/04_ai_query_optimization.sql`.
@@ -163,6 +174,8 @@ The synthetic data was generated with a script written in Cursor (see Team above
 ## Repository structure
 
 ```
+data-generation/
+  generate_fake_data.py                  Python script that generated the synthetic data (CSV per table)
 sql/
   01_create_database_and_load_data.sql   creates the database, 10 tables, synthetic data, view, function, trigger, procedure
   02_analysis_queries.sql                analysis queries (joins, nested queries, window functions, CTE)
